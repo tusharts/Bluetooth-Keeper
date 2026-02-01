@@ -1,0 +1,17 @@
+name: audio_helper
+description: A new Flutter plugin project.
+version: 0.0.1
+environment:
+  sdk: '>=3.0.3 <4.0.0'
+  flutter: ">=2.5.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.example.audio_helper
+        pluginClass: AudioHelperPlugin
