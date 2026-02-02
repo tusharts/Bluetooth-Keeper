@@ -1,72 +1,49 @@
-# Bluetooth Keeper
+﻿# Bluetooth Keeper 🔊🔋
 
-Bluetooth Keeper is a Flutter application designed to prevent Bluetooth speakers from falling asleep or disconnecting due to inactivity. It works by playing a very short, silent audio "ping" at regular intervals, ensuring the audio channel remains active without disturbing the user.
+**Bluetooth Keeper** is a specialized utility application designed to solve a common annoyance with modern Bluetooth speakers: the auto-shutoff feature. Many speakers turn themselves off after a few minutes of silence to save battery, forcing you to constantly reconnect them. 
+
+Bluetooth Keeper runs intelligently in the background, periodically playing a virtually silent audio "ping" to trick the speaker into staying awake, without interrupting your workflow or media consumption.
+
+## 📥 Download
+
+You can download the latest APK directly from the **[GitHub Releases Page](https://github.com/tusharts/Bluetooth-Keeper/releases)**.
+
+---
 
 ## 🚀 Features
 
-*   **Background Service:** Runs continuously in the background, even when the app is closed.
-*   **Smart Detection:**
-    *   **Activity Check:** Only pings if no other media (music, video) is currently playing.
-    *   **Bluetooth Check:** Optionally runs only when a Bluetooth audio device (A2DP) is connected.
-*   **Configurable Interval:** Adjust the silence interval from 1 to 20 minutes to suit your specific speaker's timeout settings.
-*   **Silent Operation:** The "ping" is a silent audio file, so it keeps the connection alive without making noise.
-*   **Android 14 Ready:** Complies with modern Android foreground service requirements.
+- **Smart "Keep-Alive" Algorithm**: Automatically detects silence and plays a micro-sound to reset the speaker's idle timer.
+- **Intelligent Monitoring**:
+  - **Connection Aware**: Only runs when a Bluetooth device is connected (configurable).
+  - **Media Aware**: Detects if music or other media is already playing and pauses its own operation to avoid interference.
+- **Background Persistence**: Utilizes a robust foreground service to ensure the app continues working even when minimized or the screen is locked.
+- **Non-Intrusive**: Uses audio mixing configurations (mixWithOthers) to ensure the "ping" never pauses your Spotify, YouTube, or calls.
+- **Battery Efficient**: Optimizes sleep cycles and only wakes up when absolutely necessary.
 
-## 📱 Screenshots
+## 🛠 Tech Stack
 
-| Home Screen | Settings |
-|:---:|:---:|
-| *(Add your screenshot here)* | *(Add your screenshot here)* |
+This project demonstrates advanced Flutter capabilities, particularly in native platform integration and background process management.
 
-## 🛠️ Installation
+*   **Framework**: Flutter (Dart)
+*   **Architecture**: Modular design with custom local plugins.
+*   **Key Libraries**:
+    *   lutter_background_service: For managing persistent Android foreground services.
+    *   udioplayers & udio_session: For precise audio playback control and managing audio focus.
+    *   lutter_local_notifications: For required service notifications.
+    *   shared_preferences: For persisting user configurations.
+*   **Native Integration (Custom Plugin)**:
+    *   Implemented a local plugin udio_helper using **Platform Channels** to access native Android APIs (checking AudioManager.isMusicActive() and Bluetooth connection state) which are not available in standard cross-platform packages.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/yourusername/bluetooth-keeper.git
-    cd bluetooth-keeper
-    ```
+## ⚙️ How It Works
 
-2.  **Install Dependencies:**
-    ```bash
-    flutter pub get
-    ```
+The app employs a state machine running in a dedicated background isolate:
 
-3.  **Run the App:**
-    ```bash
-    flutter run
-    ```
+1.  **Check Connection**: Verifies if a Bluetooth device is connected (via custom Native API).
+2.  **Check Activity**: Queries the OS to see if any other app is currently outputting audio.
+3.  **Wait**: If the speaker is idle, it waits for a user-defined interval (default: 5 minutes).
+4.  **Ping**: If no music has started during the wait, it plays a 1-byte silent WAV file. This signal is strong enough to keep the speaker hardware active but inaudible to the user.
+5.  **Loop**: The cycle repeats, ensuring your device never disconnects unexpectedly.
 
-## ⚙️ Configuration
-
-### Android Permissions
-The app requires the following permissions to function correctly:
-*   `FOREGROUND_SERVICE` & `FOREGROUND_SERVICE_MEDIA_PLAYBACK`: To run in the background.
-*   `BLUETOOTH_CONNECT`: To detect if a Bluetooth device is connected (Android 12+).
-*   `POST_NOTIFICATIONS`: To show the persistent service notification (Android 13+).
-
-### Battery Optimization
-**Important:** For the app to work reliably in the background for long periods, users should disable **Battery Optimization** for this app in their Android system settings.
-
-## 🧩 Project Structure
-
-*   `lib/`
-    *   `main.dart`: Contains the UI and the background service logic.
-    *   `silent_data.dart`: Contains the base64 encoded string of the silent audio file.
-*   `local_plugins/audio_helper`: A custom native Android plugin used to:
-    *   Check if music is currently active (`AudioManager.isMusicActive`).
-    *   Check for connected Bluetooth devices.
-*   `android/`: Native Android configuration (Kotlin).
-
-## 🏗️ Building for Release
-
-To build an APK for Android:
-
-```bash
-flutter build apk --release
-```
-
-The output will be located at `build/app/outputs/flutter-apk/app-release.apk`.
-
-## 📄 License
-
-This project is open source and available under the MIT License.
+## 👨‍💻 Author
+---
+*Note: This project is intended for personal utility and educational purposes regarding background services in modern Android versions.*
